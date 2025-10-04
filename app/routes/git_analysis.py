@@ -1,7 +1,7 @@
-from flask import request, Blueprint
+from flask import request, Blueprint, Response
+from sqlalchemy.orm import Session
 from app.database.database import SessionLocal
-from app.services.git_analyzer import analyze_repository, RepositoryNotFoundError
-from app.services import git_analyzer
+from app.services.git_analyzer import analyze_repository, RepositoryNotFoundError, git_analyzer
 from app.models.analysis import Analysis
 from app.models.author import Author
 from app.models.repository import Repository
@@ -10,15 +10,15 @@ git_analysis_bp = Blueprint('git_analysis', __name__)
 
 @git_analysis_bp.route('/analisador-git', methods=['GET'])
 def git_analysis_endpoint():
-    user = request.args.get('usuario')
-    repo_name = request.args.get('repositorio')
+    user: str = request.args.get('usuario')
+    repo_name: str = request.args.get('repositorio')
 
     if not user or not repo_name:
         return "Os parâmetros 'usuario' e 'repositorio' são obrigatórios.", 400
 
-    db = SessionLocal()
+    db: Session = SessionLocal()
     try:
-        response_text = git_analyzer.analyze_repository(db, user, repo_name)
+        response_text: str = git_analyzer.analyze_repository(db, user, repo_name)
         return response_text
     except RepositoryNotFoundError as e:
         return str(e), 400
@@ -27,12 +27,12 @@ def git_analysis_endpoint():
 
 @git_analysis_bp.route('/analisador-git/buscar', methods=['GET'])
 def search_commit_averages_endpoint():
-    authors_query = [arg for arg in request.args.values() if arg]
+    authors_query: list[str] = [arg for arg in request.args.values() if arg]
     
     if not authors_query:
         return "É necessário informar pelo menos um autor.", 400
 
-    db = SessionLocal()
+    db: Session = SessionLocal()
     try:
         unique_results = set()
         for author_name in authors_query:
