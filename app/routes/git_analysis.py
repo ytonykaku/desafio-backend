@@ -1,5 +1,6 @@
 from flask import request, Blueprint
 from app.database.database import SessionLocal
+from app.services.git_analyzer import analyze_repository, RepositoryNotFoundError
 from app.services import git_analyzer
 from app.models.analysis import Analysis
 from app.models.author import Author
@@ -19,6 +20,8 @@ def git_analysis_endpoint():
     try:
         response_text = git_analyzer.analyze_repository(db, user, repo_name)
         return response_text
+    except RepositoryNotFoundError as e:
+        return str(e), 400
     finally:
         db.close()
 
