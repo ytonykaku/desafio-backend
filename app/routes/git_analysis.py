@@ -1,7 +1,8 @@
 from flask import request, Blueprint, Response
 from sqlalchemy.orm import Session
 from app.database.database import SessionLocal
-from app.services.git_analyzer import analyze_repository, RepositoryNotFoundError, git_analyzer
+from app.services.git_analyzer import analyze_repository, RepositoryNotFoundError
+from app.services import git_analyzer
 from app.models.analysis import Analysis
 from app.models.author import Author
 from app.models.repository import Repository
